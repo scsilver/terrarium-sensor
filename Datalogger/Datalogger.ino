@@ -39,7 +39,7 @@ int nighttime = 20;
 int lamp = 8;
 int serialLED = 13;
 String motion;
-String humidify;
+String humidify = "Off";
 
 
 double Thermistor(int RawADC) {
@@ -109,7 +109,7 @@ void loop()
   float f = dht.readTemperature(true);
   // Compute heat index in Fahrenheit (the default)
   float hif = dht.computeHeatIndex(f, h);
-  humidify = "Off";
+  
   
   if (humstat-2 >= h)
   {
