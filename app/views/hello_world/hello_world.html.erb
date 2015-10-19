@@ -9,7 +9,7 @@
 
       <div class="row" style="padding: 0px">
         <div class="jumbotron col-md-3 row-3 row-3" id="sun" style="height: 300px; margin: 0px;">
-          <p class"title top" id="suntext" style:"text-align: center">Naga's<br>Terrarium<br>Monitor</p>
+          <p class"title top" id="suntext" style:"text-align: center">Naga's<br>Terrariumg<br>Monitor</p>
         </div>
         <div class="jumbotron col-md-3 row-3" id="humidity-chart" style="width: 25%; height: 300px; margin: 0 auto; padding: 5px"></div>
         <div class="jumbotron col-md-3 row-3" id="hotside-temp-chart" style="width: 25%; height: 300px; margin: 0 auto; padding: 5px "></div>
@@ -91,8 +91,8 @@
                           $('p.humTempvalue').text(res[3] + " F");
                           $('p.hum').text("Humidity: ");
                           $('p.humvalue').text(res[4] + " %");
-                          $('p.motion').text("Moving: ");
-                          $('p.motionvalue').text(res[5]);
+                          $('p.motion').text("Humidifer: ");
+                          $('p.motionvalue').text(res[7]);
 
                           $('p.datetime').text(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',(new Date()).getTime()));
                           var x = (new Date()).getTime(), // current time
@@ -324,10 +324,10 @@
                       var channel = pusher.subscribe('sensor_channel');
                       channel.bind('data_event', function(data) {
                           var res = data.value.split(", ");
+                          var x = (new Date()).getTime(); // current time
 
-                          if (res[5]=="Yes")
+                          if (res[7]=="On")
                           {
-                          var x = (new Date()).getTime(), // current time
                               y = 1;
                           }
                           else
@@ -344,7 +344,7 @@
                 }
             },
             title: {
-                text: 'Movement'
+                text: 'Humidifier Status'
             },
             xAxis: {
                 type: 'datetime',

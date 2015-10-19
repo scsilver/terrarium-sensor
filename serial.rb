@@ -13,12 +13,10 @@ while true do
   message = sp.gets
   if message
     message.chomp!
-    begin
+    
     Pusher.trigger('sensor_channel', 'data_event', {value: message})
 
-    rescue Pusher::Error => e
-      # (Pusher::AuthenticationError, Pusher::HTTPError, or Pusher::Error)
-    end
+
     open('data.csv', 'a') { |file|
       if message.size > 42
         file.puts message
