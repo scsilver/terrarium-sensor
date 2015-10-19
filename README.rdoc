@@ -1,28 +1,10 @@
-== README
+Terrarium Monitor Website
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+HTML CSS and JS display real time data being delivered throug the Pusher
+realtime data service.
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+Data is collected by sersors being read by an arduino running "dataLogger.ino".
+This arduino then sends the sensor data over serial to a ruby script
+"serial.rb". Serial.rb takes the serial data and feeds data to a Pusher server,
+which updates data in real time to a server. Using a JS push client, live
+updates to the webpage are triggered.
