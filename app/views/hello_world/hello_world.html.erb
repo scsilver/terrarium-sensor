@@ -1,0 +1,401 @@
+<html>
+<head>
+  <title>Pusher Test</title>
+  <script src="https://js.pusher.com/3.0/pusher.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+  <body>
+    <div class="container-fluid">
+
+      <div class="row" style="padding: 0px">
+        <div class="jumbotron col-md-3 row-3 row-3" id="sun" style="height: 300px; margin: 0px;">
+          <p class"title top" id="suntext" style:"text-align: center">NAGA<br>LIFE</p>
+        </div>
+        <div class="jumbotron col-md-3 row-3" id="humidity-chart" style="width: 25%; height: 300px; margin: 0 auto; padding: 5px"></div>
+        <div class="jumbotron col-md-3 row-3" id="hotside-temp-chart" style="width: 25%; height: 300px; margin: 0 auto; padding: 5px "></div>
+        <div class="jumbotron col-md-3 row-3" id="coldside-temp-chart" style="width: 25%; height: 300px; margin: 0 auto; padding: 5px "></div>
+      </div>
+
+      <div class="row" style="padding: 0px">
+        <div class="jumbotron col-md-12" id="movement-chart" style="width: 100%; height: 150px; margin: 0 auto; padding: 5px"></div>
+      </div>
+
+      <div class="row"  style="padding: 0px">
+        <div class="col-md-3 row-3">
+          <p class="motion" ></p><p class="value motionvalue" ></p>
+        </div>
+        <div class="col-md-3 row-3">
+          <p class="hum"></p><p class="value humvalue"></p>
+        </div>
+        <div class="col-md-3 row-3">
+          <p class="atemp"></p><p class="value atempvalue" ></p>
+        </div>
+        <div class="col-md-3 row-3 row-3">
+          <p class="humTemp"></p><p class="value humTempvalue" </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="jumbotron col-md-6">
+          <p class="value dark datetime"></p>
+        </div>
+        <div class="jumbotron col-md-6">
+          <p class="value dark light"></p>
+        </div>
+      </div>
+    </div>
+
+  <script>
+  var res
+    // Enable pusher logging - don't include this in production
+    Pusher.log = function(message) {
+      if (window.console && window.console.log) {
+        window.console.log(message);
+      }
+    };
+
+    var pusher = new Pusher('60dbe63931b29368c58c', {
+      encrypted: true
+    });
+
+  $(function () {
+    $(document).ready(function () {
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+
+        $('#hotside-temp-chart').highcharts({
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                events: {
+                    load: function () {
+                      var series = this.series[0];
+
+                      var channel = pusher.subscribe('sensor_channel');
+                      channel.bind('data_event', function(data) {
+                          var res = data.value.split(", ");
+
+                          $('p.light').text("Light: " +res[0] + " Lux");
+                          var color = "hsl(37, 100%, "+parseInt(res[0]*100/900)+"%)";
+                          var textcolor = "hsl(0, 0%, "+parseInt(100-(res[0]*100/800))+"%)";
+
+                          document.getElementById("suntext").style.color = textcolor;
+                          document.getElementById("sun").style.background = color;
+
+                          $('p.atemp').text("Hot Side: ");
+                          $('p.atempvalue').text(res[2] + " F");
+                          $('p.humTemp').text("Cold Side: ");
+                          $('p.humTempvalue').text(res[3] + " F");
+                          $('p.hum').text("Humidity: ");
+                          $('p.humvalue').text(res[4] + " %");
+                          $('p.motion').text("Moving: ");
+                          $('p.motionvalue').text(res[5]);
+
+                          $('p.datetime').text(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',(new Date()).getTime()));
+                          var x = (new Date()).getTime(), // current time
+                              y = res[2]*1;
+                          series.addPoint([x, y], true, true);
+                        });
+
+
+                        // set up the updating of the chart each second
+
+                    }
+                }
+            },
+            title: {
+                text: 'Hot Side Temperature'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                floor: 50,
+                min:50,
+                max: 100,
+                title: {
+                    text: 'Temperature (F)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+                name: 'Temperature data',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -199; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 70
+                        });
+                    }
+                    return data;
+                }())
+            }]
+        });
+        $('#coldside-temp-chart').highcharts({
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                events: {
+                    load: function () {
+                      var series = this.series[0];
+
+                      var channel = pusher.subscribe('sensor_channel');
+                      channel.bind('data_event', function(data) {
+                          var res = data.value.split(", ");
+
+
+
+                          var x = (new Date()).getTime(), // current time
+                              y = res[3]*1;
+                          series.addPoint([x, y], true, true);
+                        });
+
+
+                        // set up the updating of the chart each second
+
+                    }
+                }
+            },
+            title: {
+                text: 'Cold Side Temperature'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                floor: 50,
+                min:50,
+                max: 100,
+                title: {
+                    text: 'Temperature (F)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+                name: 'Temperature data',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -199; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 70
+                        });
+                    }
+                    return data;
+                }())
+            }]
+        });
+
+
+        $('#humidity-chart').highcharts({
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                events: {
+                    load: function () {
+                      var series = this.series[0];
+
+                      var channel = pusher.subscribe('sensor_channel');
+                      channel.bind('data_event', function(data) {
+                          var res = data.value.split(", ");
+
+
+                          var x = (new Date()).getTime(), // current time
+                              y = res[4]*1;
+                          series.addPoint([x, y], true, true);
+                        });
+
+
+                        // set up the updating of the chart each second
+
+                    }
+                }
+            },
+            title: {
+                text: 'Humidity'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                floor: 20,
+                min:20,
+                max: 80,
+                title: {
+                    text: 'Relative Humidity (%)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+                name: 'Humidity data',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -199; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 50
+                        });
+                    }
+                    return data;
+                }())
+            }]
+        });
+        $('#movement-chart').highcharts({
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                events: {
+                    load: function () {
+                      var series = this.series[0];
+
+                      var channel = pusher.subscribe('sensor_channel');
+                      channel.bind('data_event', function(data) {
+                          var res = data.value.split(", ");
+
+                          if (res[5]=="Yes")
+                          {
+                          var x = (new Date()).getTime(), // current time
+                              y = 1;
+                          }
+                          else
+                          {
+                            y = 0;
+                          }
+                          series.addPoint([x, y], true, true);
+                        });
+
+
+                        // set up the updating of the chart each second
+
+                    }
+                }
+            },
+            title: {
+                text: 'Movement'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                min:0,
+                max: 1,
+                title: {
+                    text: 'Movement (Yes or No)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+                name: 'Movement data',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -199; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 0
+                        });
+                    }
+                    return data;
+                }())
+            }]
+        });
+    });
+});
+</script>
+
+
+</head>
+</html>
