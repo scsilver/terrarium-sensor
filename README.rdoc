@@ -8,3 +8,26 @@ This arduino then sends the sensor data over serial to a ruby script
 "serial.rb". Serial.rb takes the serial data and feeds data to a Pusher server,
 which updates data in real time to a server. Using a JS push client, live
 updates to the webpage are triggered.
+
+Features include
+
+1. Timed control of 2 100W 120V basking lights using 5v to 120v relay and using
+home wall power
+
+2. 1 Temperature sensors for lighted and dark sides respectively totalling 2
+
+3. Light sensor to determine wether basking lights are on, room light is on,
+daylight
+
+4. Movement sensor to determin if owners are awake in room
+
+5. Humidity sensor on dark Side
+
+Soon to be implemented
+
+1. Humidity control with sensor feedback using 5v usb humidifyer controlled by
+a transistor. Humidity control will keep humidity levels within prefered range,
+50-60%
+
+2. Switch to lightless ceramic heat lamp and create feedback loop to keep heat
+levels within 70-88 degrees F.
