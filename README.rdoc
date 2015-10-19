@@ -11,8 +11,9 @@ updates to the webpage are triggered.
 
 Features include
 
-1. Timed control of 2 100W 120V basking lights using 5v to 120v relay and using
-home wall power
+1. Humidity control with sensor feedback using 5v usb humidifyer controlled by
+a 5v to 120v wall power relay and an ac to dc 5v converter. Humidity control will keep humidity levels within prefered range,
+50-60%
 
 2. 1 Temperature sensors for lighted and dark sides respectively totalling 2
 
@@ -25,9 +26,9 @@ daylight
 
 Soon to be implemented
 
-1. Humidity control with sensor feedback using 5v usb humidifyer controlled by
-a transistor. Humidity control will keep humidity levels within prefered range,
-50-60%
+
+1. Timed control of 2 100W 120V basking lights using 5v to 120v relay and using
+home wall power
 
 2. Switch to lightless ceramic heat lamp and create feedback loop to keep heat
 levels within 70-88 degrees F.
