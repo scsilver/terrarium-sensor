@@ -325,15 +325,15 @@
 
                           var res = data.value.split(", ");
                           var x = (new Date()).getTime(); // current time
+                            if (res[7]=="On")
+                            {
+                                y = 1;
+                            }
+                            else
+                            {
+                              y = 0;
+                            }
 
-                          if (res[7]=="On")
-                          {
-                              y = 1;
-                          }
-                          else
-                          {
-                            y = 0;
-                          }
                           series.addPoint([x, y], true, true);
                         });
 
